@@ -1,0 +1,100 @@
+import pygame
+pygame.init()
+screen = pygame.display.set_mode((800, 600))
+font = pygame.font.Font(None, 36)
+pygame.display.set_caption("Mini Max Algorithm")
+running = True
+screen.fill((255,255,255))
+pygame.draw.line(screen, (0,0,0), (266,0), (266, 600))
+pygame.draw.line(screen, (0,0,0), (532,0), (532, 600))
+pygame.draw.line(screen, (0,0,0), (0,200), (800, 200))
+pygame.draw.line(screen, (0,0,0), (0,400), (800, 400))
+pygame.display.flip()
+board=[
+        [0,0,0],
+        [0,0,0],
+        [0,0,0]
+    ]
+def quadrant(x,y):
+    if x > 532:
+        x = 666
+    elif x > 266:
+        x = 399
+    else:
+        x = 133
+
+    if y > 400:
+        y = 500
+    elif y > 200:
+        y = 300
+    else:
+        y = 100
+    return x,y
+def getboardpos(x,y):
+    return board[y][x]
+def isvalid(x,y):
+    x = int(((int(x / 133) - 3) / 2) + 1)
+    y = int(((int(y / 100) - 3) / 2) + 1)
+    if board[y][x] == 0:
+        return True
+    else:
+        return False
+def updateboard(x,y,t):
+    x = int(((int(x/133)-3)/2)+1)
+    y = int(((int(y/100)-3)/2)+1)
+    board[y][x] = t
+def wincheck():
+    print('Wincheck called')
+    print(f'Board: {board}')
+    win = 0
+    for x in board:
+        if (x[0] == x[1]) and (x[1] == x[2]):
+            win = x[0]
+            if win !=0 :
+                break
+    for i in range(3):
+        if getboardpos(i,0) == getboardpos(i,1) and getboardpos(i,1) == getboardpos(i,2):
+            win = getboardpos(i,0)
+            if win !=0 :
+                break
+    diagonal = [getboardpos(0,0), getboardpos(1,1), getboardpos(2,2)]
+    if diagonal[0] == diagonal[1] and diagonal[1] == diagonal[2]:
+        win = diagonal[0]
+    diagonal = [getboardpos(0,2), getboardpos(1,1), getboardpos(2,0)]
+    return win
+def loss(x,y,t):
+    board1 = board.copy()
+
+
+
+circle = True
+while running:
+    clock = pygame.time.Clock()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                x,y = pygame.mouse.get_pos()
+                x,y = quadrant(x,y)
+                if isvalid(x,y):
+                    if circle:
+                        pygame.draw.circle(screen, (0,0,0),(x,y),90)
+                        updateboard(x,y,2)
+                        pygame.draw.circle(screen, (255, 255, 255), (x, y), 89)
+                        circle = False
+                    else:
+                        pygame.draw.line(screen, (0,0,0), (x-45, y-45), (x+45,y+45))
+                        updateboard(x,y,1)
+                        pygame.draw.line(screen, (0, 0, 0), (x + 45, y - 45), (x - 45, y + 45))
+                        circle = True
+                    a = wincheck()
+                    if a < 1:
+                        pass
+                    else:
+                        if a ==1:
+                            print('x wins')
+                        if a ==2:
+                            print('y wins')
+                        running = False
+        pygame.display.update()
